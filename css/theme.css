@@ -1,0 +1,267 @@
+:root {
+    --bg-primary: #f0f4f8;
+    --bg-secondary: #ffffff;
+    --color-primary: #2c3e50;
+    --color-accent: #06484c;
+    --shadow-soft: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+#particles-js {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: -1; /* 确保粒子效果在内容下方 */
+
+}
+
+body {
+    font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+    background-color: var(--bg-primary);
+    color: var(--color-accent);
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.header {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    gap: 20px;
+}
+
+.search-wrapper {
+    display: flex;
+    align-items: center;
+    background-color: var(--bg-secondary);
+    border-radius: 35px;
+    box-shadow: var(--shadow-soft);
+    overflow: hidden;
+    max-width: 600px;
+    width: 100%;
+    transition: box-shadow 0.3s ease;
+}
+
+.search-wrapper:focus-within {
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.3);
+}
+
+.search-wrapper select {
+    border: none;
+    padding: 15px;
+    background-color: transparent;
+    border-right: 1px solid #e0e0e0;
+    font-size: 16px;
+    outline: none;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml;utf8,<svg fill='black' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/><path d='M0 0h24v24H0z' fill='none'/></svg>");
+    background-repeat: no-repeat;
+    background-position-x: 100%;
+    background-position-y: 50%;
+    padding-right: 30px;
+}
+
+.search-wrapper input {
+    border: none;
+    flex-grow: 1;
+    padding: 15px;
+    background-color: transparent;
+    font-size: 16px;
+    outline: none;
+}
+
+.search-wrapper button {
+    background-color: var(--color-accent);
+    color: white;
+    border: none;
+    padding: 15px 20px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-size: 16px;
+}
+
+.search-wrapper button:hover {
+    background-color: #2980b9;
+}
+
+.categories {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 30px;
+    justify-content: center;
+}
+
+.category-tag {
+    padding: 8px 15px;
+    border-radius: 20px;
+    background-color: var(--bg-secondary);
+    color: var(--color-primary);
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: var(--shadow-soft);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.category-tag.active,
+.category-tag:hover {
+    background-color: var(--color-accent);
+    color: white;
+    transform: scale(1.05);
+}
+
+.links-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 20px;
+}
+
+.link-card {
+    background-color: var(--bg-secondary);
+    border-radius: 15px;
+    padding: 20px;
+    text-align: center;
+    box-shadow: var(--shadow-soft);
+    transition: all 0.3s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+}
+
+.link-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.link-card img {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+    border-radius: 50%;
+    background-color: #f1f2f3;
+    padding: 10px;
+}
+
+.link-card a {
+    color: var(--color-primary);
+    text-decoration: none;
+    font-weight: 600;
+    pointer-events: none;
+}
+
+/* 默认情况下，隐藏 .carousel-container */
+.carousel-container {
+    display: none;
+}
+
+
+.carousel-content {
+    position: absolute;
+    width: 100%;
+    transition: transform 0.5s ease;
+}
+
+.carousel-item {
+    height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    font-size: 22px;
+}
+
+.carousel-item a {
+    text-decoration: none;
+    color: #333;
+    transition: color 0.3s;
+}
+
+.carousel-item a:hover {
+    color: #007bff;
+}
+
+.loading {
+    text-align: center;
+    color: #999;
+}
+
+/* 当屏幕宽度大于 1200px 时，显示 .carousel-container，即新闻区域 */
+@media (min-width: 1200px) {
+    .carousel-container {
+        display: block; /* 或者 inline-block，取决于你的需求 */
+        width: 1000px;
+        height: 120px;
+        overflow: hidden;
+    position: fixed; /* 固定定位 */
+    bottom: 0; /* 固定在页面底部 */
+        margin: 50px auto;
+        background-color: transparent;
+    }
+}
+
+/* 响应式设计 */
+@media screen and (max-width: 768px) {
+    .header {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .search-wrapper {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .categories {
+        justify-content: center;
+    }
+
+    .links-grid {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 15px;
+    }
+
+    .link-card {
+        padding: 15px;
+    }
+
+    .link-card img {
+        width: 50px;
+        height: 50px;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .links-grid {
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+        gap: 10px;
+    }
+
+    .link-card {
+        padding: 10px;
+    }
+
+    .link-card img {
+        width: 40px;
+        height: 40px;
+    }
+}
