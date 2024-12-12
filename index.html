@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>思维兵工厂</title>
+    <link href="./css/all.min.css" rel="stylesheet">
+    <script src="./js/particles.min.js"></script>
+    <style>
+        :root {
+            --bg-primary: #f0f4f8;
+            --bg-secondary: #ffffff;
+            --color-primary: #2c3e50;
+            --color-accent: #06484c;
+            --shadow-soft: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        #particles-js {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: -1; /* 确保粒子效果在内容下方 */
+
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--color-accent);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            gap: 20px;
+        }
+
+        .search-wrapper {
+            display: flex;
+            align-items: center;
+            background-color: var(--bg-secondary);
+            border-radius: 35px;
+            box-shadow: var(--shadow-soft);
+            overflow: hidden;
+            max-width: 600px;
+            width: 100%;
+            transition: box-shadow 0.3s ease;
+        }
+
+        .search-wrapper:focus-within {
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.3);
+        }
+
+        .search-wrapper select {
+            border: none;
+            padding: 15px;
+            background-color: transparent;
+            border-right: 1px solid #e0e0e0;
+            font-size: 16px;
+            outline: none;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url("data:image/svg+xml;utf8,<svg fill='black' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/><path d='M0 0h24v24H0z' fill='none'/></svg>");
+            background-repeat: no-repeat;
+            background-position-x: 100%;
+            background-position-y: 50%;
+            padding-right: 30px;
+        }
+
+        .search-wrapper input {
+            border: none;
+            flex-grow: 1;
+            padding: 15px;
+            background-color: transparent;
+            font-size: 16px;
+            outline: none;
+        }
+
+        .search-wrapper button {
+            background-color: var(--color-accent);
+            color: white;
+            border: none;
+            padding: 15px 20px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-size: 16px;
+        }
+
+        .search-wrapper button:hover {
+            background-color: #2980b9;
+        }
+
+        .categories {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 30px;
+            justify-content: center;
+        }
+
+        .category-tag {
+            padding: 8px 15px;
+            border-radius: 20px;
+            background-color: var(--bg-secondary);
+            color: var(--color-primary);
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: var(--shadow-soft);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .category-tag.active,
+        .category-tag:hover {
+            background-color: var(--color-accent);
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .links-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 20px;
+        }
+
+        .link-card {
+            background-color: var(--bg-secondary);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: var(--shadow-soft);
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+        }
+
+        .link-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .link-card img {
+            width: 60px;
+            height: 60px;
+            object-fit: contain;
+            border-radius: 50%;
+            background-color: #f1f2f3;
+            padding: 10px;
+        }
+
+        .link-card a {
+            color: var(--color-primary);
+            text-decoration: none;
+            font-weight: 600;
+            pointer-events: none;
+        }
+
+        /* 响应式设计 */
+        @media screen and (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .search-wrapper {
+                width: 100%;
+                max-width: 100%;
+            }
+
+            .categories {
+                justify-content: center;
+            }
+
+            .links-grid {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+                gap: 15px;
+            }
+
+            .link-card {
+                padding: 15px;
+            }
+
+            .link-card img {
+                width: 50px;
+                height: 50px;
+            }
+        }
+
+        @media screen and (max-width: 480px) {
+            .links-grid {
+                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+                gap: 10px;
+            }
+
+            .link-card {
+                padding: 10px;
+            }
+
+            .link-card img {
+                width: 40px;
+                height: 40px;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="css/theme.css">
+</head>
+<body>
+<div class="container">
+    <div id="particles-js"></div> <!-- 粒子效果容器 -->
+
+    <div class="header">
+        <h1>思维兵工厂</h1>
+        <div class="search-wrapper" id="search-wrapper">
+            <select id="search-engine">
+                <option value="https://www.baidu.com/s?wd=">百度</option>
+                <option value="https://www.sogou.com/web?query=">搜狗</option>
+                <option value="https://cn.bing.com/search?q=">必应</option>
+                <option value="https://metaso.cn/search/?q=">秘塔</option>
+                <option value="https://www.google.com/search?q=">谷歌</option>
+            </select>
+            <input type="text" id="search-input" placeholder="请输入关键词...">
+            <button onclick="performSearch()">
+                <i class="fas fa-search"></i>
+            </button>
+        </div>
+    </div>
+
+    <div class="categories" id="category-list">
+        <div class="category-tag active" data-category="常用"><i class="fas fa-star"></i> 常用</div>
+        <div class="category-tag" data-category="AI"><i class="fas fa-robot"></i> AI官网</div>
+        <div class="category-tag" data-category="云服务"><i class="fas fa-cloud"></i> 云服务</div>
+        <div class="category-tag" data-category="工具汇集"><i class="fas fa-tools"></i> 工具汇集</div>
+        <div class="category-tag" data-category="墙外世界"><i class="fas fa-person-walking"></i> 墙外世界</div>
+        <div class="category-tag" data-category="优质博客"><i class="fas fa-blog"></i> 优质博客</div>
+    </div>
+
+    <div class="links-grid" id="links-container">
+        <!-- 链接将动态插入 -->
+    </div>
+
+</div>
+<script>
+    window.onload = function () {
+        particlesJS('particles-js', {
+            particles: {
+                number: {value: 150, density: {enable: true, value_area: 1200}},
+                color: {value: '#3498db'},
+                shape: {
+                    type: 'circle',
+                    stroke: {width: 0, color: '#000000'},
+                    image: {src: '', width: 100, height: 100}
+                },
+                opacity: {
+                    value: 0.7,
+                    random: true,
+                    anim: {enable: true, speed: 2, opacity_min: 0.3, sync: false}
+                },
+                size: {value: 3, random: true, anim: {enable: true, speed: 3, size_min: 0.5, sync: false}},
+                line_linked: {
+                    enable: true,
+                    distance: 150,
+                    color: '#3498db',
+                    opacity: 0.6,
+                    width: 1
+                },
+                move: {
+                    enable: true,
+                    speed: 2,
+                    direction: 'none',
+                    random: true,
+                    straight: false,
+                    out_mode: 'out',
+                    bounce: false,
+                    attract: {
+                        enable: true,  // 启用全局吸引效果
+                        rotateX: 600,
+                        rotateY: 1200
+                    }
+                }
+            },
+            interactivity: {
+                detect_on: 'canvas',
+                events: {
+                    onhover: {
+                        enable: true,
+                        mode: ['bubble', 'attract']  // 同时保留bubble和添加attract效果
+                    },
+                    onclick: {enable: true, mode: 'repulse'},
+                    resize: true
+                },
+                modes: {
+                    attract: {
+                        distance: 200,  // 鼠标吸引距离
+                        speed: 3        // 鼠标吸引速度
+                    },
+                    bubble: {
+                        distance: 400,
+                        size: 10,
+                        duration: 2,
+                        opacity: 0.8,
+                        speed: 3
+                    },
+                    repulse: {
+                        distance: 200,
+                        duration: 0.4
+                    }
+                }
+            },
+            retina_detect: true
+        });
+    };
+</script>
+
+<script>
+    // 确保在文档加载完成后再执行脚本
+    document.addEventListener('DOMContentLoaded', function () {
+        const websites = {
+            "常用": [
+                {
+                    "name": "ChatGPT",
+                    "subtitle": "OpenAI开发",
+                    "url": "https://chat.openai.com",
+                    "icon": "./icon/chatgpt.png"
+                },
+                {
+                    "name": "DeepSeek",
+                    "subtitle": "国产开源先河",
+                    "url": "https://chat.deepseek.com/",
+                    "icon": "./icon/deepseek.svg"
+                },
+                {
+                    "name": "Kimi",
+                    "subtitle": "月之暗面",
+                    "url": "https://kimi.moonshot.cn/",
+                    "icon": "./icon/kimi.ico"
+                },
+                {
+                    "name": "通义千问",
+                    "subtitle": "阿里巴巴",
+                    "url": "https://tongyi.aliyun.com/qianwen/",
+                    "icon": "./icon/tongyi.svg"
+                },
+                {
+                    "name": "讯飞星火",
+                    "subtitle": "讯飞星火",
+                    "url": "https://xinghuo.xfyun.cn/desk",
+                    "icon": "./icon/xfyun.png"
+                },
+                {
+                    "name": "硅基流动",
+                    "subtitle": "大模型里的拼多多",
+                    "url": "https://cloud.siliconflow.cn/models",
+                    "icon": "./icon/siliconflow.svg"
+                },
+                {
+                    "name": "腾讯镜像",
+                    "subtitle": "腾讯云的镜像仓库",
+                    "url": "https://console.cloud.tencent.com/tcr",
+                    "icon": "./icon/cloud_tencent.ico"
+                },
+                {
+                    "name": "腾讯函数",
+                    "subtitle": "腾讯的函数服务",
+                    "url": "https://console.cloud.tencent.com/scf/index",
+                    "icon": "./icon/cloud_tencent.ico"
+                },
+                {
+                    "name": "微信网页版",
+                    "url": "https://wx.qq.com",
+                    "icon": "./icon/wx.ico",
+                    "subtitle": "微信在线网页版"
+                },
+                {
+                    "name": "微信公众平台",
+                    "subtitle": "微信公众平台",
+                    "url": "https://mp.weixin.qq.com/",
+                    "icon": "https://mp.weixin.qq.com/favicon.ico"
+                },
+                {
+                    "name": "微信视频号",
+                    "subtitle": "微信视频号",
+                    "url": "https://channels.weixin.qq.com/login.html",
+                    "icon": "./icon/channels.ico"
+                },
+                {
+                    "name": "微信测试号",
+                    "subtitle": "供微信开发使用",
+                    "url": "https://mp.weixin.qq.com/debug/cgi-bin/sandbox?t=sandbox/login",
+                    "icon": "./icon/wx_test.ico"
+                },
+                {
+                    "name": "GitHub",
+                    "subtitle": "最大的开源代码库",
+                    "url": "https://www.github.com",
+                    "icon": "./icon/github.ico"
+                },
+                {
+                    "name": "Gitee",
+                    "subtitle": "国内开源代码平台",
+                    "url": "https://www.gitee.com",
+                    "icon": "./icon/gitee.ico"
+                },
+                {
+                    "name": "哔哩哔哩",
+                    "url": "https://www.bilibili.com",
+                    "icon": "./icon/bilibili.ico",
+                    "subtitle": "国内视频网站"
+                },
+                {
+                    "name": "知乎",
+                    "url": "https://www.zhihu.com",
+                    "subtitle": "国内问答平台",
+                    "icon": "./icon/zhihu.ico",
+                },
+                {
+                    "name": "Claude镜像",
+                    "url": "https://share.claude.best",
+                    "subtitle": "免费claude镜像站点",
+                    "icon": "./icon/share_claude.png",
+                },
+                {
+                    "name": "ChatGPT镜像",
+                    "url": "https://www.9e.lv",
+                    "subtitle": "免费ChatGPT镜像",
+                    "icon": "./icon/share_claude.png",
+                },
+            ],
+            "AI": [
+                {
+                    "name": "ChatGPT",
+                    "subtitle": "OpenAI开发",
+                    "url": "https://chat.openai.com",
+                    "icon": "./icon/chatgpt.png"
+                },
+                {
+                    "name": "DeepSeek",
+                    "subtitle": "国产开源先河",
+                    "url": "https://chat.deepseek.com/",
+                    "icon": "./icon/deepseek.svg"
+                },
+                {
+                    "name": "Kimi",
+                    "subtitle": "月之暗面",
+                    "url": "https://kimi.moonshot.cn/",
+                    "icon": "./icon/kimi.ico"
+                },
+                {
+                    "name": "通义千问",
+                    "subtitle": "阿里巴巴",
+                    "url": "https://tongyi.aliyun.com/qianwen/",
+                    "icon": "./icon/tongyi.svg"
+                },
+                {
+                    "name": "讯飞星火",
+                    "subtitle": "讯飞星火",
+                    "url": "https://xinghuo.xfyun.cn/desk",
+                    "icon": "./icon/xfyun.png"
+                },
+                {
+                    "name": "硅基流动",
+                    "subtitle": "大模型里的拼多多",
+                    "url": "https://cloud.siliconflow.cn/models",
+                    "icon": "./icon/siliconflow.svg"
+                },
+                {
+                    "name": "海螺问问",
+                    "subtitle": "海螺问问",
+                    "url": "https://hailuoai.com/",
+                    "icon": "./icon/hailuoai.png"
+                },
+                {
+                    "name": "智普清言",
+                    "subtitle": "智谱 AI 公司于2023年开发",
+                    "url": "https://chatglm.cn/",
+                    "icon": "./icon/chatglm.png"
+                },
+            ],
+            "云服务": [
+                {
+                    "name": "阿里云",
+                    "subtitle": "阿里云主页",
+                    "url": "https://www.aliyun.com/",
+                    "icon": "./icon/ali_cloud.ico"
+                },
+                {
+                    "name": "腾讯云",
+                    "subtitle": "腾讯云主页",
+                    "url": "https://cloud.tencent.com/",
+                    "icon": "./icon/tencent_cloud.ico"
+                },
+                {
+                    "name": "华为云",
+                    "subtitle": "华为云主页",
+                    "url": "https://www.huaweicloud.com/",
+                    "icon": "./icon/huaweicloud.ico"
+                },
+                {
+                    "name": "火山引擎",
+                    "subtitle": "字节跳动",
+                    "url": "https://www.volcengine.com/",
+                    "icon": "./icon/volcengine.ico"
+                },
+                {
+                    "name": "七牛云",
+                    "subtitle": "云服务",
+                    "url": "https://portal.qiniu.com/home",
+                    "icon": "./icon/qiniu.ico"
+                },
+
+                {
+                    "name": "讯飞开放平台",
+                    "subtitle": "讯飞开放平台",
+                    "url": "https://www.xfyun.cn/",
+                    "icon": "./icon/xfyun_cloud.ico"
+                },
+
+                {
+                    "name": "坚果云",
+                    "subtitle": "个人云存储服务",
+                    "url": "https://www.jianguoyun.com",
+                    "icon": "./icon/jianguoyun.ico"
+                },
+                {
+                    "name": "缤纷云",
+                    "subtitle": "免费的对象存储",
+                    "url": "https://console.bitiful.com/dashboard",
+                    "icon": "./icon/bitiful.ico"
+                },
+
+                {
+                    "name": "MemFire",
+                    "subtitle": "免费的数据库",
+                    "url": "https://cloud.memfiredb.com/generaloverview",
+                    "icon": "./icon/memfiredb.ico"
+                },
+                {
+                    "name": "SQLhub",
+                    "subtitle": "云服务",
+                    "url": "https://sqlpub.com/dashboard",
+                    "icon": "./icon/sqlpub.ico"
+                }
+            ],
+            "工具汇集": [
+                {
+                    "name": "蓝奏云",
+                    "url": "https://www.lanzou.com/",
+                    "subtitle": "免费存储100M文件",
+                    "icon": "./icon/lanzou.ico",
+                },
+                {
+                    "name": "QQ邮箱",
+                    "url": "https://mail.qq.com",
+                    "icon": "./icon/qq_mail.ico",
+                    "subtitle": "腾讯旗下邮箱服务"
+                },
+                {
+                    "name": "临时邮箱",
+                    "subtitle": "国内临时邮箱",
+                    "url": "https://www.snapmail.cc/",
+                    "icon": "./icon/snapmail.ico"
+                },
+                {
+                    "name": "图怪兽",
+                    "subtitle": "作图工具",
+                    "url": "https://818ps.com/home",
+                    "icon": "./icon/tuguaishou.png"
+                },
+                {
+                    "name": "好维持",
+                    "subtitle": "虚假美国地址",
+                    "url": "https://www.haoweichi.com/",
+                    "icon": "./icon/haoweichi.ico"
+                },
+                {
+                    "name": "NatApp",
+                    "subtitle": "内网穿透",
+                    "url": "https://natapp.cn/",
+                    "icon": "./icon/natapp.png"
+                }
+            ],
+            "墙外世界": [
+                {
+                    name: "Youtube",
+                    subtitle: "国外视频平台",
+                    url: "https://www.youtube.com/",
+                    icon: "./icon/youtube.ico",
+                },
+
+                {
+                    name: "Stack Overflow",
+                    subtitle: "IT问答平台",
+                    url: "https://www.stackoverflow.com",
+                    icon: "./icon/stackoverflow.ico",
+                },
+                {
+                    name: "Jitter",
+                    subtitle: "动画制作网址",
+                    url: "https://jitter.video/",
+                    icon: "./icon/jitter.png",
+                },
+                {
+                    name: "Proton邮箱",
+                    subtitle: "Proton邮箱",
+                    url: "https://account.proton.me/mail",
+                    icon: "./icon/proton.ico",
+                },
+
+            ],
+            "优质博客": [
+                {
+                    "name": "L站",
+                    "url": "https://linux.do/",
+                    "icon": "./icon/linux.png",
+                    "subtitle": "新互联网分享平台"
+                },
+                {
+                    "name": "链滴",
+                    "url": "https://ld246.com/",
+                    "icon": "./icon/liandi.png",
+                    "subtitle": "思源笔记论坛"
+                }
+            ]
+        };
+
+
+        function renderLinks(category) {
+            // 使用更安全的选择器
+            const linksContainer = document.getElementById('links-container');
+
+            // 添加错误处理
+            if (!linksContainer) {
+                console.error('Links container not found');
+                return;
+            }
+
+            // 清空容器
+            linksContainer.innerHTML = '';
+
+            // 检查分类是否存在
+            if (!websites[category]) {
+                console.error('Category not found:', category);
+                return;
+            }
+
+            websites[category].forEach(site => {
+                const linkCard = document.createElement('div');
+                linkCard.className = 'link-card';
+                linkCard.addEventListener('click', () => {
+                    window.open(site.url, '_blank');
+                });
+
+                const icon = document.createElement('img');
+                icon.src = site.icon;
+                icon.alt = site.name;
+                icon.onerror = function () {
+                    // 如果图标加载失败，使用默认图标
+                    this.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="9" x2="15" y2="15"></line><line x1="15" y1="9" x2="9" y2="15"></line></svg>';
+                };
+
+                const link = document.createElement('a');
+                link.href = site.url;
+                link.target = '_blank';
+                link.textContent = site.name;
+
+                // 添加副标题
+                const subtitle = document.createElement('div');
+                subtitle.className = 'site-subtitle';
+                subtitle.textContent = site.subtitle;
+
+                linkCard.appendChild(icon);
+                linkCard.appendChild(link);
+                linkCard.appendChild(subtitle);
+                linksContainer.appendChild(linkCard);
+            });
+        }
+
+        // 初始化：默认显示常用网址
+        renderLinks('常用');
+
+        // 分类切换事件
+        const categoryList = document.getElementById('category-list');
+        if (categoryList) {
+            categoryList.addEventListener('click', function (e) {
+                const categoryTag = e.target.closest('.category-tag');
+                if (categoryTag) {
+                    // 移除所有active类
+                    this.querySelectorAll('.category-tag').forEach(tag => tag.classList.remove('active'));
+
+                    // 给点击的分类添加active类
+                    categoryTag.classList.add('active');
+
+                    // 渲染对应分类的链接
+                    renderLinks(categoryTag.dataset.category);
+                }
+            });
+        }
+
+        // 搜索功能
+        function performSearch() {
+            const searchEngine = document.getElementById('search-engine');
+            const searchInput = document.getElementById('search-input');
+
+            if (searchEngine && searchInput && searchInput.value) {
+                window.open(searchEngine.value + encodeURIComponent(searchInput.value), '_blank');
+            }
+        }
+
+        // 添加搜索按钮点击事件
+        const searchButton = document.querySelector('.search-wrapper button');
+        if (searchButton) {
+            searchButton.addEventListener('click', performSearch);
+        }
+
+        // 添加键盘回车事件监听
+        const searchInputElement = document.getElementById('search-input');
+        if (searchInputElement) {
+            searchInputElement.addEventListener('keypress', function (e) {
+                if (e.key === 'Enter') {
+                    performSearch();
+                }
+            });
+        }
+    });
+</script>
+
+
+</body>
+</html>
