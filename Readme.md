@@ -2,9 +2,9 @@
 
 > 一个纯静态的响应式网址导航页面，采用原生HTML/CSS/JavaScript开发，无需后端服务器即可运行。，支持自定义分类和拖拽排序
 
-![大屏幕效果](assets\Readme\big-image.png)
+![大屏幕效果](./assets/Readme/big-image.png)
 
-![小屏幕效果](assets\Readme\small-image.png)
+![小屏幕效果](./assets/Readme/small-image.png)
 
 
 ## 🌟 核心特性
