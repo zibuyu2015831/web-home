@@ -315,6 +315,9 @@ class NewsCarousel {
 
         this.newsData = await this.fetchCarouselData();
 
+        // 设置移动端UI
+        this.setupMobileUI();
+
         if (this.newsData.all && this.newsData.all.length > 0) {
             // 生成分类标签
             this.generateCategoryTabs();
@@ -326,6 +329,60 @@ class NewsCarousel {
                 this.newsListContainer.innerHTML = '<div class="no-news">暂无新闻内容</div>';
             }
         }
+    }
+
+    // 设置移动端 UI
+    // 设置移动端 UI
+    setupMobileUI() {
+        const sidebar = document.querySelector('.news-sidebar');
+        if (!sidebar || window.innerWidth > 768) return;
+
+        // 1. 添加关闭按钮 (如果尚未添加)
+        if (!sidebar.querySelector('.mobile-sidebar-close')) {
+            const closeBtn = document.createElement('button');
+            closeBtn.className = 'mobile-sidebar-close';
+            closeBtn.innerHTML = '<i class="fas fa-times"></i>';
+            closeBtn.addEventListener('click', () => this.toggleSidebar());
+            // 直接添加到 sidebar 容器，确保位于最上层且不随列表刷新消失
+            sidebar.appendChild(closeBtn);
+        }
+
+        // 2. 添加手势监听 (如果尚未添加)
+        if (!sidebar.dataset.swipeInitialized) {
+            this.setupMobileGestures(sidebar);
+            sidebar.dataset.swipeInitialized = 'true';
+        }
+    }
+
+    // 设置移动端手势
+    setupMobileGestures(sidebar) {
+        let startX = 0;
+        let startY = 0;
+
+        sidebar.addEventListener('touchstart', (e) => {
+            startX = e.touches[0].clientX;
+            startY = e.touches[0].clientY;
+        }, { passive: true });
+
+        sidebar.addEventListener('touchend', (e) => {
+            if (!startX) return;
+
+            const endX = e.changedTouches[0].clientX;
+            const endY = e.changedTouches[0].clientY;
+            const diffX = endX - startX;
+            const diffY = endY - startY;
+
+            // 逻辑: 右滑 (diffX > 50) 且 水平移动明显大于垂直移动 (防止误触发上下滚动)
+            if (diffX > 50 && Math.abs(diffX) > Math.abs(diffY)) {
+                // 只有当侧边栏打开时才触发关闭 (防止误触)
+                if (!sidebar.classList.contains('collapsed')) {
+                    this.toggleSidebar();
+                }
+            }
+
+            startX = 0;
+            startY = 0;
+        });
     }
 
     // 切换侧边栏显示/隐藏

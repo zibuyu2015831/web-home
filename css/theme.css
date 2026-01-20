@@ -285,6 +285,8 @@ body.sort-mode .header h1:hover {
     background-position-x: 100%;
     background-position-y: 50%;
     padding-right: 30px;
+    flex-shrink: 0;
+    /* 防止在小屏幕压缩 */
 }
 
 .search-wrapper select option {
@@ -326,6 +328,8 @@ body.sort-mode .header h1:hover {
     cursor: pointer;
     transition: background-color 0.3s;
     font-size: 16px;
+    flex-shrink: 0;
+    /* 防止在小屏幕压缩 */
 }
 
 .search-wrapper button:hover {
@@ -505,7 +509,30 @@ body.sort-mode .header h1:hover {
     .search-wrapper {
         width: 100%;
         max-width: 100%;
+        border-radius: 25px;
+        /* 稍微减小圆角 */
     }
+
+    .search-wrapper input {
+        padding: 10px 15px;
+        /* 减小内边距 */
+    }
+
+    .search-wrapper select {
+        padding: 10px 0 10px 10px;
+        /* 减小内边距 */
+        padding-right: 25px;
+        /* 箭头空间 */
+        background-position-x: 95%;
+        /* 调整箭头位置 */
+    }
+
+    .search-wrapper button {
+        padding: 10px 15px;
+        /* 减小内边距 */
+        font-size: 14px;
+    }
+
 
     .categories {
         justify-content: center;

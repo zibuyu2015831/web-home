@@ -15,8 +15,13 @@
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 .modal-content {
@@ -35,6 +40,7 @@
     transform: scale(0.95);
     opacity: 0;
   }
+
   to {
     transform: scale(1);
     opacity: 1;
@@ -344,8 +350,10 @@
   border-right: 1px solid var(--sidebar-border);
   display: flex;
   flex-direction: column;
-  justify-content: center; /* 垂直居中 */
-  align-items: stretch; /* 子元素横向拉伸 */
+  justify-content: center;
+  /* 垂直居中 */
+  align-items: stretch;
+  /* 子元素横向拉伸 */
   padding: 20px 0;
 }
 
@@ -602,6 +610,11 @@
     min-width: 450px;
   }
 
+  .carousel-container {
+    display: block !important;
+    /* Ensure visible in sidebar */
+  }
+
   .news-sidebar:not(.collapsed)~.container .main-content {
     margin-right: 35%;
   }
@@ -630,13 +643,55 @@
 }
 
 @media (max-width: 768px) {
+
+  /* 移动端侧边栏基础样式 */
   .news-sidebar {
     width: 100%;
     min-width: 100%;
+    z-index: 1000;
+    flex-direction: column;
+    height: 100vh;
   }
 
   .news-sidebar:not(.collapsed)~.container .main-content {
     margin-right: 0;
+  }
+
+  /* 移动端切换按钮样式优化 */
+  /* Expanded State (Sidebar Visible): Hide toggle button, use close button instead */
+  .news-sidebar:not(.collapsed) .sidebar-toggle {
+    display: none;
+  }
+
+  .sidebar-toggle {
+    left: auto;
+    right: 0;
+    top: 0;
+    transform: none;
+    width: 44px;
+    height: 44px;
+    border-radius: 0;
+    background: var(--color-accent);
+    opacity: 0.9;
+    z-index: 1002;
+  }
+
+  .sidebar-toggle:hover {
+    left: auto;
+    right: 0;
+    background: var(--color-accent);
+  }
+
+  /* Collapsed State (Sidebar Hidden): Button needs to stick out to be visible */
+  .news-sidebar.collapsed .sidebar-toggle {
+    right: auto;
+    /* Override right: 0 from above */
+    left: -44px;
+    /* Position it to the left of the sidebar edge */
+    top: 10px;
+    border-radius: 10px 0 0 10px;
+    /* Rounded on left side */
+    box-shadow: -2px 0 8px rgba(0, 0, 0, 0.2);
   }
 
   .modal-content {
@@ -644,27 +699,93 @@
     margin: 20px;
   }
 
+  /* 移动端标签容器改为顶部横向排列 */
   .news-tabs-container {
-    width: 100px;
-    padding: 15px 0;
+    width: 100%;
+    flex-direction: row;
+    flex-shrink: 0;
+    border-right: none;
+    border-bottom: 1px solid var(--sidebar-border);
+    padding: 20px 12px 12px 12px;
+    /* 增加顶部间距，避免贴顶 */
+    padding-right: 60px !important;
+    /* 强制预留60px空间，防止被关闭按钮(44px)遮挡 */
+    overflow-x: auto;
+    white-space: nowrap;
+    background: var(--sidebar-bg);
+    justify-content: flex-start;
+    /* 修复左侧遮挡严重问题，从头开始排列 */
   }
 
+  /* 标签列表容器 */
   .news-tabs {
-    padding: 0 10px;
+    display: flex;
+    flex-direction: row;
+    /* padding: 0 8px;  <-- Removed to avoid conflict with .news-tabs-container padding */
     gap: 8px;
+    width: auto;
   }
 
+  /* 单个标签样式 */
   .news-tab {
-    padding: 10px 12px;
+    padding: 8px 12px;
     font-size: 13px;
+    flex-shrink: 0;
   }
 
   .sidebar-header {
     padding: 20px 25px 20px 120px;
   }
 
+  /* 新闻列表区域调整 */
+  .news-main-content {
+    flex: 1;
+    overflow-y: auto;
+    width: 100%;
+  }
+
   .news-list {
     padding: 15px 20px;
+  }
+
+  /* 移动端关闭按钮 - 优化样式 */
+  .mobile-sidebar-close {
+    display: none;
+    /* 暂时隐藏关闭按钮，使用右滑关闭 */
+    /* display: flex;     <-- 已隐藏，如需恢复请取消注释此行并注释上一行 */
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 44px;
+    /* 与顶部栏高度一致 */
+    height: 44px;
+    border-radius: 0 0 0 12px;
+    background: rgba(0, 0, 0, 0.2);
+    /* 半透明背景，更协调 */
+    backdrop-filter: blur(4px);
+    color: rgba(255, 255, 255, 0.9);
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    z-index: 1003;
+    /* 比其他元素高 */
+    transition: all 0.2s ease;
+  }
+
+  .mobile-sidebar-close:hover {
+    background: rgba(0, 0, 0, 0.4);
+  }
+
+  /* Ensure news content is visible on mobile */
+  .news-sidebar .carousel-container {
+    display: block !important;
+    position: static;
+    /* Override possible fixed positioning from desktop ticker */
+    width: 100%;
+    height: 100%;
+    margin: 0;
   }
 }
 
@@ -674,4 +795,3 @@
   transform: translateY(-3px);
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
 }
-
