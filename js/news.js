@@ -3,6 +3,7 @@
 // 缓存配置常量
 const NEWS_CACHE_KEY = 'newsDataCache';
 const NEWS_CACHE_DURATION = 10 * 60 * 1000;  // 10 分钟
+const NEWS_API_URL = 'https://api.mdnice.com/trendings';
 
 class NewsCarousel {
     constructor(containerId) {
@@ -102,7 +103,7 @@ class NewsCarousel {
 
             // 获取新数据
             console.log('从 API 获取新闻数据');
-            const response = await fetch("https://api.mdnice.com/trendings");
+            const response = await fetch(NEWS_API_URL);
 
             if (!response.ok) {
                 throw new Error(`HTTP ${response.status}: ${response.statusText}`);

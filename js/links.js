@@ -69,6 +69,78 @@ function validateIconUrl(url) {
     return validateUrl(url, ['http:', 'https:', 'file:']);
 }
 
+// ============ Modal 类 (通用模态框管理) ============
+class Modal {
+    constructor(title, contentHtml, onConfirm = null) {
+        this.title = title;
+        this.contentHtml = contentHtml;
+        this.onConfirm = onConfirm;
+        this.element = this.createDom();
+        this.append();
+        this.bindEvents();
+    }
+
+    createDom() {
+        const modal = document.createElement("div");
+        modal.className = "modal";
+        modal.innerHTML = `
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>${this.title}</h2>
+          <button class="close-btn">&times;</button>
+        </div>
+        ${this.contentHtml}
+      </div>
+    `;
+        return modal;
+    }
+
+    append() {
+        document.body.appendChild(this.element);
+        // 确保动画效果
+        requestAnimationFrame(() => {
+            this.element.classList.add('show');
+        });
+    }
+
+    bindEvents() {
+        // 关闭按钮
+        this.element.querySelector('.close-btn').addEventListener('click', () => this.close());
+
+        // 取消按钮 (如果有)
+        const cancelBtn = this.element.querySelector('.btn-cancel');
+        if (cancelBtn) {
+            cancelBtn.addEventListener('click', () => this.close());
+        }
+
+        // 点击背景关闭
+        this.element.addEventListener('click', (e) => {
+            if (e.target === this.element) {
+                this.close();
+            }
+        });
+
+        // 表单提交
+        const form = this.element.querySelector('form');
+        if (form && this.onConfirm) {
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                this.onConfirm(e, this);
+            });
+        }
+    }
+
+    close() {
+        this.element.classList.remove('show');
+        setTimeout(() => {
+            if (this.element.parentNode) {
+                document.body.removeChild(this.element);
+            }
+        }, 300); // 等待过渡动画结束
+    }
+}
+
+
 // ============ LinksManager 类 ============
 
 class LinksManager {
@@ -546,11 +618,9 @@ class LinksManager {
         return addCard;
     }
 
-    // 显示添加/编辑对话框 (带 XSS 防护)
+    // 显示添加/编辑对话框 (重构版 - 使用 Modal 类)
     showAddDialog(editData = null) {
         const isEdit = editData !== null;
-        const modal = document.createElement("div");
-        modal.className = "modal";
 
         // 转义所有用户输入,防止 XSS 攻击
         const safeName = escapeHtml(editData?.name || '');
@@ -558,104 +628,81 @@ class LinksManager {
         const safeSubtitle = escapeHtml(editData?.subtitle || '');
         const safeIcon = escapeHtml(editData?.icon || '');
 
-        modal.innerHTML = `
-      <div class="modal-content">
-        <div class="modal-header">
-          <h2>${isEdit ? '编辑网站' : '添加新网站'}</h2>
-          <button class="close-btn">&times;</button>
-        </div>
-        <form id="add-website-form">
-          <div class="form-group">
-            <label for="site-name">网站名称 *</label>
-            <input type="text" id="site-name" required value="${safeName}">
-          </div>
-          <div class="form-group">
-            <label for="site-url">网站URL *</label>
-            <input type="url" id="site-url" required value="${safeUrl}">
-          </div>
-          <div class="form-group">
-            <label for="site-subtitle">副标题</label>
-            <input type="text" id="site-subtitle" value="${safeSubtitle}">
-          </div>
-          <div class="form-group">
-            <label for="site-icon">图标URL</label>
-            <input type="text" id="site-icon" placeholder="留空将自动获取favicon" value="${safeIcon}">
-          </div>
-          <div class="form-group">
-            <label for="site-category">分类 *</label>
-            <select id="site-category" required>
-              ${Object.keys(this.websites).map(cat =>
+        const formHtml = `
+            <form id="add-website-form">
+                <div class="form-group">
+                    <label for="site-name">网站名称 *</label>
+                    <input type="text" id="site-name" required value="${safeName}">
+                </div>
+                <div class="form-group">
+                    <label for="site-url">网站URL *</label>
+                    <input type="url" id="site-url" required value="${safeUrl}">
+                </div>
+                <div class="form-group">
+                    <label for="site-subtitle">副标题</label>
+                    <input type="text" id="site-subtitle" value="${safeSubtitle}">
+                </div>
+                <div class="form-group">
+                    <label for="site-icon">图标URL</label>
+                    <input type="text" id="site-icon" placeholder="留空将自动获取favicon" value="${safeIcon}">
+                </div>
+                <div class="form-group">
+                    <label for="site-category">分类 *</label>
+                    <select id="site-category" required>
+                    ${Object.keys(this.websites).map(cat =>
             `<option value="${escapeHtml(cat)}" ${editData?.category === cat ? 'selected' : ''}>${escapeHtml(cat)}</option>`
         ).join('')}
-            </select>
-          </div>
-          <div class="form-actions">
-            <button type="button" class="btn-cancel">取消</button>
-            <button type="submit" class="btn-submit">${isEdit ? '保存' : '添加'}</button>
-          </div>
-        </form>
-      </div>
-    `;
+                    </select>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-cancel">取消</button>
+                    <button type="submit" class="btn-submit">${isEdit ? '保存' : '添加'}</button>
+                </div>
+            </form>
+        `;
 
-        document.body.appendChild(modal);
+        new Modal(
+            isEdit ? '编辑网站' : '添加新网站',
+            formHtml,
+            (e, modal) => {
+                const name = document.getElementById('site-name').value.trim();
+                const url = document.getElementById('site-url').value.trim();
+                const subtitle = document.getElementById('site-subtitle').value.trim();
+                const icon = document.getElementById('site-icon').value.trim();
+                const category = document.getElementById('site-category').value;
 
-        // 关闭按钮事件
-        modal.querySelector('.close-btn').addEventListener('click', () => {
-            document.body.removeChild(modal);
-        });
+                // 验证 URL
+                const urlValidation = validateUrl(url);
+                if (!urlValidation.valid) {
+                    alert(`URL 验证失败: ${urlValidation.error}`);
+                    return;
+                }
 
-        modal.querySelector('.btn-cancel').addEventListener('click', () => {
-            document.body.removeChild(modal);
-        });
+                // 验证图标 URL
+                const iconValidation = validateIconUrl(icon);
+                if (!iconValidation.valid) {
+                    alert(`图标 URL 验证失败: ${iconValidation.error}`);
+                    return;
+                }
 
-        // 点击模态框外部关闭
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) {
-                document.body.removeChild(modal);
+                const formData = {
+                    name: name,
+                    url: urlValidation.url,
+                    subtitle: subtitle,
+                    icon: iconValidation.url || this.getFaviconUrl(urlValidation.url),
+                    category: category,
+                    custom: true
+                };
+
+                if (isEdit) {
+                    this.updateWebsite(editData.category, editData.index, formData);
+                } else {
+                    this.addWebsite(formData);
+                }
+
+                modal.close();
             }
-        });
-
-        // 表单提交事件 (带 URL 验证)
-        modal.querySelector('#add-website-form').addEventListener('submit', (e) => {
-            e.preventDefault();
-
-            const name = document.getElementById('site-name').value.trim();
-            const url = document.getElementById('site-url').value.trim();
-            const subtitle = document.getElementById('site-subtitle').value.trim();
-            const icon = document.getElementById('site-icon').value.trim();
-            const category = document.getElementById('site-category').value;
-
-            // 验证 URL
-            const urlValidation = validateUrl(url);
-            if (!urlValidation.valid) {
-                alert(`URL 验证失败: ${urlValidation.error}`);
-                return;
-            }
-
-            // 验证图标 URL
-            const iconValidation = validateIconUrl(icon);
-            if (!iconValidation.valid) {
-                alert(`图标 URL 验证失败: ${iconValidation.error}`);
-                return;
-            }
-
-            const formData = {
-                name: name,
-                url: urlValidation.url,
-                subtitle: subtitle,
-                icon: iconValidation.url || this.getFaviconUrl(urlValidation.url),
-                category: category,
-                custom: true
-            };
-
-            if (isEdit) {
-                this.updateWebsite(editData.category, editData.index, formData);
-            } else {
-                this.addWebsite(formData);
-            }
-
-            document.body.removeChild(modal);
-        });
+        );
     }
 
     // 获取网站的 favicon URL
@@ -815,72 +862,47 @@ class LinksManager {
         this.renderCategories();
     }
 
-    // 显示重命名分类对话框
+    // 显示重命名分类对话框 (重构版 - 使用 Modal 类)
     showRenameCategoryDialog(oldName) {
-        const modal = document.createElement("div");
-        modal.className = "modal";
-        modal.innerHTML = `
-      <div class="modal-content">
-        <div class="modal-header">
-          <h2>重命名分类</h2>
-          <button class="close-btn">&times;</button>
-        </div>
-        <form id="rename-category-form">
-          <div class="form-group">
-            <label for="category-new-name">新分类名称 *</label>
-            <input type="text" id="category-new-name" required value="${oldName}" placeholder="请输入新分类名称">
-          </div>
-          <div class="form-actions">
-            <button type="button" class="btn-cancel">取消</button>
-            <button type="submit" class="btn-submit">保存</button>
-          </div>
-        </form>
-      </div>
-    `;
+        const formHtml = `
+            <form id="rename-category-form">
+                <div class="form-group">
+                    <label for="category-new-name">新分类名称 *</label>
+                    <input type="text" id="category-new-name" required value="${oldName}" placeholder="请输入新分类名称">
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-cancel">取消</button>
+                    <button type="submit" class="btn-submit">保存</button>
+                </div>
+            </form>
+        `;
 
-        document.body.appendChild(modal);
+        new Modal(
+            '重命名分类',
+            formHtml,
+            (e, modal) => {
+                const newName = document.getElementById('category-new-name').value.trim();
 
-        // 关闭按钮事件
-        modal.querySelector('.close-btn').addEventListener('click', () => {
-            document.body.removeChild(modal);
-        });
+                // 验证新名称
+                if (!newName) {
+                    alert('分类名称不能为空');
+                    return;
+                }
 
-        modal.querySelector('.btn-cancel').addEventListener('click', () => {
-            document.body.removeChild(modal);
-        });
+                if (newName === oldName) {
+                    alert('新名称与原名称相同');
+                    return;
+                }
 
-        // 点击模态框外部关闭
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) {
-                document.body.removeChild(modal);
+                if (this.websites[newName]) {
+                    alert('该分类已存在，请使用其他名称');
+                    return;
+                }
+
+                this.renameCategory(oldName, newName);
+                modal.close();
             }
-        });
-
-        // 表单提交事件
-        modal.querySelector('#rename-category-form').addEventListener('submit', (e) => {
-            e.preventDefault();
-
-            const newName = document.getElementById('category-new-name').value.trim();
-
-            // 验证新名称
-            if (!newName) {
-                alert('分类名称不能为空');
-                return;
-            }
-
-            if (newName === oldName) {
-                alert('新名称与原名称相同');
-                return;
-            }
-
-            if (this.websites[newName]) {
-                alert('该分类已存在，请使用其他名称');
-                return;
-            }
-
-            this.renameCategory(oldName, newName);
-            document.body.removeChild(modal);
-        });
+        );
     }
 
     // 重命名分类

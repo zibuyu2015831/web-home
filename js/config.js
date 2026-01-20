@@ -218,9 +218,25 @@ const particlesDarkConfig = {
 };
 
 // 根据主题获取粒子配置
+// 根据主题获取粒子配置
 function getParticlesConfig() {
   const theme = getCurrentTheme();
-  return theme === 'dark' ? particlesDarkConfig : particlesLightConfig;
+  const config = theme === 'dark' ? particlesDarkConfig : particlesLightConfig;
+
+  // 检测移动设备 (屏幕宽度小于768px 或 UserAgent匹配)
+  const isMobile = window.innerWidth < 768 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+  if (isMobile) {
+    // 深拷贝配置以避免修改原始对象
+    const mobileConfig = JSON.parse(JSON.stringify(config));
+    // 减少移动端粒子数量以优化性能 (50%)
+    if (mobileConfig.particles && mobileConfig.particles.number) {
+      mobileConfig.particles.number.value = Math.floor(mobileConfig.particles.number.value * 0.5);
+    }
+    return mobileConfig;
+  }
+
+  return config;
 }
 
 // 初始化粒子效果
