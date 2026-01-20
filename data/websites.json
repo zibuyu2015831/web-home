@@ -622,55 +622,5 @@
       "icon": "./icon/obsidian.ico",
       "subtitle": "obsidian开发文档"
     }
-  ],
-  "工作": [
-    {
-      "name": "探巡项目地址",
-      "url": "https://github.com/orgs/scantist/repositories",
-      "icon": "./icon/github.ico",
-      "subtitle": "项目文档"
-    },
-    {
-      "name": "探巡项目面板",
-      "url": "https://scantist.atlassian.net/jira/software/projects/CN/boards/44",
-      "icon": "./icon/jira.png",
-      "subtitle": "Jira项目管理"
-    },
-    {
-      "name": "探巡项目文档",
-      "url": "https://scantist.atlassian.net/wiki/spaces/PROD/pages/2209185814/Scantist+DevSecOps+V4",
-      "icon": "./icon/jira.png",
-      "subtitle": "项目文档"
-    },
-    {
-      "name": "探巡测试环境",
-      "url": "https://v4dev.scantist.io/",
-      "icon": "./icon/tanxun.svg",
-      "subtitle": "通用功能"
-    },
-    {
-      "name": "中汽研",
-      "url": "https://v4dev-2.scantist.io/",
-      "icon": "./icon/zhongqiyan.svg",
-      "subtitle": "中汽研测试环境"
-    },
-    {
-      "name": "微信网页版",
-      "url": "https://wx.qq.com",
-      "icon": "./icon/wechat.png",
-      "subtitle": "微信在线网页版"
-    },
-    {
-      "name": "Element Plus",
-      "url": "https://cn.element-plus.org/zh-CN/guide/design.html",
-      "icon": "./icon/element_plus.png",
-      "subtitle": "Element Plus文档"
-    },
-    {
-      "name": "Process on",
-      "url": "https://www.processon.com/",
-      "icon": "./icon/processon.ico",
-      "subtitle": "在线画图"
-    }
   ]
 }
