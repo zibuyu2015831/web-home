@@ -53,10 +53,6 @@ The application uses a modular class-based architecture initialized in `js/app.j
 # 推荐方式：直接打开文件（完整功能支持）
 # 直接在浏览器中打开 index.html 文件
 # 或在文件管理器中双击 index.html
-
-# Alternative: Use Python simple server (if needed for CORS testing)
-python -m http.server 8000
-# Then visit http://localhost:8000
 ```
 
 **注意**：由于是纯HTML/CSS/JS实现，直接打开 `index.html` 文件即可完整使用所有功能，包括编辑模式、拖拽排序、本地存储等。
@@ -208,7 +204,7 @@ Modules communicate through:
 Check icon path in `data/websites.js` - must match filename in `icon/` directory exactly. Fallback SVG will display if file missing.
 
 ### localStorage Corruption
-Clear browser data for localhost:8000 or use `localStorage.clear()` in console if websites disappear.
+Clear browser data or use `localStorage.clear()` in console if websites disappear.
 
 **Symptoms**: Websites disappear, drag-and-drop stops working, theme resets
 **Solution**:
