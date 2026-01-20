@@ -1,672 +1,81 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>思维兵工厂</title>
-    <link href="./css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="css/theme.css">
-    <script src="./js/particles.min.js"></script>
 
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>思维兵工厂</title>
+  <!-- Font Awesome 6.4.0 -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="css/theme.css">
+  <link rel="stylesheet" href="css/components.css">
+  <!-- Particles.js 2.0.0 -->
+  <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
 </head>
+
 <body>
-<div class="container">
-    <div id="particles-js"></div> <!-- 粒子效果容器 -->
+  <!-- 粒子效果容器（移到最外层，覆盖整个页面） -->
+  <div id="particles-js"></div>
+
+  <!-- 新闻侧边栏 -->
+  <div class="news-sidebar collapsed">
+    <button class="sidebar-toggle" id="toggle-sidebar">
+      <i class="fas fa-chevron-left sidebar-icon"></i>
+    </button>
+    <!-- 新闻分类标签 -->
+    <div class="news-tabs-container" id="newsTabsContainer">
+      <!-- 分类标签将动态插入 -->
+    </div>
+    <!-- 右侧主要内容区域 -->
+    <div class="news-main-content">
+      <!-- 新闻内容区域 -->
+      <div class="carousel-wrapper">
+        <div class="carousel-container">
+          <div class="news-list" id="carouselContent">
+            <div class="loading">加载中...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 主容器 -->
+  <div class="container">
 
     <div class="header">
-        <h1>思维兵工厂</h1>
-        <div class="search-wrapper" id="search-wrapper">
-            <select id="search-engine">
-                <option value="https://www.baidu.com/s?wd=">百度</option>
-                <option value="https://www.sogou.com/web?query=">搜狗</option>
-                <option value="https://cn.bing.com/search?q=">必应</option>
-                <option value="https://metaso.cn/search/?q=">秘塔</option>
-                <option value="https://www.google.com/search?q=">谷歌</option>
-            </select>
-            <input type="text" id="search-input" placeholder="请输入关键词...">
-            <button onclick="performSearch()">
-                <i class="fas fa-search"></i>
-            </button>
-        </div>
+      <h1>思维兵工厂</h1>
+      <div class="search-wrapper" id="search-wrapper">
+        <select id="search-engine">
+          <option value="https://www.baidu.com/s?wd=">百度</option>
+          <option value="https://www.sogou.com/web?query=">搜狗</option>
+          <option value="https://cn.bing.com/search?q=">必应</option>
+          <option value="https://metaso.cn/search/?q=">秘塔</option>
+          <option value="https://www.google.com/search?q=">谷歌</option>
+        </select>
+        <input type="text" id="search-input" placeholder="请输入关键词...">
+        <button>
+          <i class="fas fa-search"></i>
+        </button>
+      </div>
     </div>
 
     <div class="categories" id="category-list">
-        <div class="category-tag active" data-category="常用"><i class="fas fa-star"></i> 常用</div>
-        <div class="category-tag" data-category="AI"><i class="fas fa-robot"></i> AI官网</div>
-        <div class="category-tag" data-category="云服务"><i class="fas fa-cloud"></i> 云服务</div>
-        <div class="category-tag" data-category="工具汇集"><i class="fas fa-tools"></i> 工具汇集</div>
-        <div class="category-tag" data-category="墙外世界"><i class="fas fa-person-walking"></i> 墙外世界</div>
-        <div class="category-tag" data-category="优质博客"><i class="fas fa-blog"></i> 优质博客</div>
+      <!-- 分类标签将动态生成 -->
     </div>
 
     <div class="links-grid" id="links-container">
-        <!-- 链接将动态插入 -->
+      <!-- 链接将动态插入 -->
     </div>
+  </div>
 
-    <!-- 新闻区域 -->
-    <div class="carousel-container">
-        <div class="carousel-content loading" id="carouselContent">
-            加载中...
-        </div>
-    </div>
-
-</div>
-
-<!-- 获取、轮播新闻 -->
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const carousel = document.getElementById('carouselContent');
-        const itemHeight = 120;
-        let currentIndex = 0;
-        let intervalId;
-
-        function parseData(data) {
-            const realData = data.data
-            const newsDict = []
-            for (let i = 0; i < realData.length; i++) {
-                if (realData[i].type === 'zhihu' || realData[i].type === 'weibo') {
-
-                    for (let j = 0; j < realData[i].trendingItemList.length; j++) {
-                        const url = realData[i].trendingItemList[j].link
-                        const title = `【${realData[i].name}】 ${realData[i].trendingItemList[j].title} 【${realData[i].trendingItemList[j].titleTag}】`
-                        const item = {
-                            url: url,
-                            title: title
-                        }
-                        newsDict.push(item)
-                    }
-
-                    newsDict.push(realData[i].trendingItemList)
-                }
-            }
-
-            return newsDict
-
-        }
-
-        // 动态获取轮播数据的函数
-        async function fetchCarouselData() {
-            try {
-                // 替换为您实际的接口地址
-                const response = await fetch('https://api.mdnice.com/trendings');
-                const data = await response.json();
-                return parseData(data);
-            } catch (error) {
-                console.error('获取轮播数据失败:', error);
-                return [];
-            }
-        }
-
-        // 生成轮播项的函数
-        function generateCarouselItems(items) {
-            carousel.innerHTML = ''; // 清空现有内容
-            items.forEach((item, index) => {
-                const carouselItem = document.createElement('div');
-                carouselItem.className = 'carousel-item';
-
-                const link = document.createElement('a');
-                link.href = item.url || '#'; // 如果没有链接，默认为 #
-                link.target = '_blank';
-                link.textContent = item.title;
-
-                carouselItem.appendChild(link);
-                carousel.appendChild(carouselItem);
-            });
-        }
-
-        // 轮播切换函数
-        function nextSlide() {
-            currentIndex++;
-            if (currentIndex >= carousel.children.length) {
-                currentIndex = 0;
-            }
-            carousel.style.transform = `translateY(-${currentIndex * itemHeight}px)`;
-        }
-
-        // 启动轮播
-        function startCarousel() {
-            intervalId = setInterval(nextSlide, 3500);
-        }
-
-        // 停止轮播
-        function stopCarousel() {
-            clearInterval(intervalId);
-        }
-
-        // 初始化轮播
-        async function initCarousel() {
-            const carouselData = await fetchCarouselData();
-
-            if (carouselData.length > 0) {
-
-                generateCarouselItems(carouselData);
-
-                // 鼠标悬停事件
-                carousel.addEventListener('mouseenter', stopCarousel);
-                carousel.addEventListener('mouseleave', startCarousel);
-
-                // 开始轮播
-                startCarousel();
-            } else {
-                carousel.innerHTML = '<div class="carousel-item">暂无新闻内容</div>';
-            }
-        }
-
-        // 执行初始化
-        initCarousel();
-    });
-</script>
-
-<!-- 控制粒子效果 -->
-<script>
-    window.onload = function () {
-        particlesJS('particles-js', {
-            particles: {
-                number: {value: 150, density: {enable: true, value_area: 1200}},
-                color: {value: '#3498db'},
-                shape: {
-                    type: 'circle',
-                    stroke: {width: 0, color: '#000000'},
-                    image: {src: '', width: 100, height: 100}
-                },
-                opacity: {
-                    value: 0.7,
-                    random: true,
-                    anim: {enable: true, speed: 2, opacity_min: 0.3, sync: false}
-                },
-                size: {value: 3, random: true, anim: {enable: true, speed: 3, size_min: 0.5, sync: false}},
-                line_linked: {
-                    enable: true,
-                    distance: 150,
-                    color: '#3498db',
-                    opacity: 0.6,
-                    width: 1
-                },
-                move: {
-                    enable: true,
-                    speed: 2,
-                    direction: 'none',
-                    random: true,
-                    straight: false,
-                    out_mode: 'out',
-                    bounce: false,
-                    attract: {
-                        enable: true,  // 启用全局吸引效果
-                        rotateX: 600,
-                        rotateY: 1200
-                    }
-                }
-            },
-            interactivity: {
-                detect_on: 'canvas',
-                events: {
-                    onhover: {
-                        enable: true,
-                        mode: ['bubble', 'attract']  // 同时保留bubble和添加attract效果
-                    },
-                    onclick: {enable: true, mode: 'repulse'},
-                    resize: true
-                },
-                modes: {
-                    attract: {
-                        distance: 200,  // 鼠标吸引距离
-                        speed: 3        // 鼠标吸引速度
-                    },
-                    bubble: {
-                        distance: 400,
-                        size: 10,
-                        duration: 2,
-                        opacity: 0.8,
-                        speed: 3
-                    },
-                    repulse: {
-                        distance: 200,
-                        duration: 0.4
-                    }
-                }
-            },
-            retina_detect: true
-        });
-    };
-</script>
-
-<!-- 渲染网址卡片 -->
-<script>
-    // 确保在文档加载完成后再执行脚本
-    document.addEventListener('DOMContentLoaded', function () {
-        const websites = {
-            "常用": [
-                {
-                    "name": "ChatGPT",
-                    "subtitle": "OpenAI开发",
-                    "url": "https://chat.openai.com",
-                    "icon": "./icon/chatgpt.png"
-                },
-                {
-                    "name": "DeepSeek",
-                    "subtitle": "国产开源先河",
-                    "url": "https://chat.deepseek.com/",
-                    "icon": "./icon/deepseek.svg"
-                },
-                {
-                    "name": "Kimi",
-                    "subtitle": "月之暗面",
-                    "url": "https://kimi.moonshot.cn/",
-                    "icon": "./icon/kimi.ico"
-                },
-                {
-                    "name": "通义千问",
-                    "subtitle": "阿里巴巴",
-                    "url": "https://tongyi.aliyun.com/qianwen/",
-                    "icon": "./icon/tongyi.svg"
-                },
-                {
-                    "name": "讯飞星火",
-                    "subtitle": "讯飞星火",
-                    "url": "https://xinghuo.xfyun.cn/desk",
-                    "icon": "./icon/xfyun.png"
-                },
-                {
-                    "name": "硅基流动",
-                    "subtitle": "开源模型汇总",
-                    "url": "https://cloud.siliconflow.cn/models",
-                    "icon": "./icon/siliconflow.svg"
-                },
-                {
-                    "name": "腾讯镜像",
-                    "subtitle": "腾讯云的镜像仓库",
-                    "url": "https://console.cloud.tencent.com/tcr",
-                    "icon": "./icon/cloud_tencent.ico"
-                },
-                {
-                    "name": "腾讯函数",
-                    "subtitle": "腾讯的函数服务",
-                    "url": "https://console.cloud.tencent.com/scf/index",
-                    "icon": "./icon/cloud_tencent.ico"
-                },
-                {
-                    "name": "微信网页版",
-                    "url": "https://wx.qq.com",
-                    "icon": "./icon/wx.ico",
-                    "subtitle": "微信在线网页版"
-                },
-                {
-                    "name": "微信公众平台",
-                    "subtitle": "微信公众平台",
-                    "url": "https://mp.weixin.qq.com/",
-                    "icon": "https://mp.weixin.qq.com/favicon.ico"
-                },
-                {
-                    "name": "微信视频号",
-                    "subtitle": "微信视频号",
-                    "url": "https://channels.weixin.qq.com/login.html",
-                    "icon": "./icon/channels.ico"
-                },
-                {
-                    "name": "微信测试号",
-                    "subtitle": "供微信开发使用",
-                    "url": "https://mp.weixin.qq.com/debug/cgi-bin/sandbox?t=sandbox/login",
-                    "icon": "./icon/wx_test.ico"
-                },
-                {
-                    "name": "GitHub",
-                    "subtitle": "最大的开源代码库",
-                    "url": "https://www.github.com",
-                    "icon": "./icon/github.ico"
-                },
-                {
-                    "name": "Gitee",
-                    "subtitle": "国内开源代码平台",
-                    "url": "https://www.gitee.com",
-                    "icon": "./icon/gitee.ico"
-                },
-                {
-                    "name": "哔哩哔哩",
-                    "url": "https://www.bilibili.com",
-                    "icon": "./icon/bilibili.ico",
-                    "subtitle": "国内视频网站"
-                },
-                {
-                    "name": "知乎",
-                    "url": "https://www.zhihu.com",
-                    "subtitle": "国内问答平台",
-                    "icon": "./icon/zhihu.ico",
-                },
-                {
-                    "name": "Claude镜像",
-                    "url": "https://share.claude.best",
-                    "subtitle": "免费Claude镜像",
-                    "icon": "./icon/share_claude.png",
-                },
-                {
-                    "name": "ChatGPT镜像",
-                    "url": "https://www.9e.lv",
-                    "subtitle": "免费ChatGPT镜像",
-                    "icon": "./icon/share_claude.png",
-                },
-            ],
-            "AI": [
-                {
-                    "name": "ChatGPT",
-                    "subtitle": "OpenAI开发",
-                    "url": "https://chat.openai.com",
-                    "icon": "./icon/chatgpt.png"
-                },
-                {
-                    "name": "DeepSeek",
-                    "subtitle": "国产开源先河",
-                    "url": "https://chat.deepseek.com/",
-                    "icon": "./icon/deepseek.svg"
-                },
-                {
-                    "name": "Kimi",
-                    "subtitle": "月之暗面",
-                    "url": "https://kimi.moonshot.cn/",
-                    "icon": "./icon/kimi.ico"
-                },
-                {
-                    "name": "通义千问",
-                    "subtitle": "阿里巴巴",
-                    "url": "https://tongyi.aliyun.com/qianwen/",
-                    "icon": "./icon/tongyi.svg"
-                },
-                {
-                    "name": "讯飞星火",
-                    "subtitle": "讯飞星火",
-                    "url": "https://xinghuo.xfyun.cn/desk",
-                    "icon": "./icon/xfyun.png"
-                },
-                {
-                    "name": "硅基流动",
-                    "subtitle": "开源模型汇总",
-                    "url": "https://cloud.siliconflow.cn/models",
-                    "icon": "./icon/siliconflow.svg"
-                },
-                {
-                    "name": "海螺问问",
-                    "subtitle": "MinMax-上海稀宇",
-                    "url": "https://hailuoai.com/",
-                    "icon": "./icon/hailuoai.png"
-                },
-                {
-                    "name": "智谱清言",
-                    "subtitle": "智谱 AI 公司",
-                    "url": "https://chatglm.cn/",
-                    "icon": "./icon/chatglm.png"
-                },
-                {
-                    "name": "跃问",
-                    "subtitle": "阶跃星辰",
-                    "url": "https://yuewen.cn/",
-                    "icon": "./icon/yuewen.svg"
-                },
-                {
-                    "name": "百川大模型",
-                    "subtitle": "百川智能",
-                    "url": "https://ying.baichuan-ai.com/",
-                    "icon": "./icon/baichuan.png"
-                },
-                {
-                    "name": "文心一言",
-                    "subtitle": "百度出品",
-                    "url": "https://yiyan.baidu.com/",
-                    "icon": "./icon/wenxinyiyan.png"
-                },
-                {
-                    "name": "天工AI",
-                    "subtitle": "百度出品",
-                    "url": "https://www.tiangong.cn/",
-                    "icon": "./icon/tg.png"
-                },
-            ],
-            "云服务": [
-                {
-                    "name": "阿里云",
-                    "subtitle": "阿里云主页",
-                    "url": "https://www.aliyun.com/",
-                    "icon": "./icon/ali_cloud.ico"
-                },
-                {
-                    "name": "腾讯云",
-                    "subtitle": "腾讯云主页",
-                    "url": "https://cloud.tencent.com/",
-                    "icon": "./icon/tencent_cloud.ico"
-                },
-                {
-                    "name": "华为云",
-                    "subtitle": "华为云主页",
-                    "url": "https://www.huaweicloud.com/",
-                    "icon": "./icon/huaweicloud.ico"
-                },
-                {
-                    "name": "火山引擎",
-                    "subtitle": "字节跳动",
-                    "url": "https://www.volcengine.com/",
-                    "icon": "./icon/volcengine.ico"
-                },
-                {
-                    "name": "七牛云",
-                    "subtitle": "云服务",
-                    "url": "https://portal.qiniu.com/home",
-                    "icon": "./icon/qiniu.ico"
-                },
-
-                {
-                    "name": "讯飞开放平台",
-                    "subtitle": "讯飞开放平台",
-                    "url": "https://www.xfyun.cn/",
-                    "icon": "./icon/xfyun_cloud.ico"
-                },
-
-                {
-                    "name": "坚果云",
-                    "subtitle": "个人云存储服务",
-                    "url": "https://www.jianguoyun.com",
-                    "icon": "./icon/jianguoyun.ico"
-                },
-                {
-                    "name": "缤纷云",
-                    "subtitle": "免费的对象存储",
-                    "url": "https://console.bitiful.com/dashboard",
-                    "icon": "./icon/bitiful.ico"
-                },
-
-                {
-                    "name": "MemFire",
-                    "subtitle": "免费的数据库",
-                    "url": "https://cloud.memfiredb.com/generaloverview",
-                    "icon": "./icon/memfiredb.ico"
-                },
-                {
-                    "name": "SQLhub",
-                    "subtitle": "云服务",
-                    "url": "https://sqlpub.com/dashboard",
-                    "icon": "./icon/sqlpub.ico"
-                }
-            ],
-            "工具汇集": [
-                {
-                    "name": "蓝奏云",
-                    "url": "https://www.lanzou.com/",
-                    "subtitle": "免费存储100M文件",
-                    "icon": "./icon/lanzou.ico",
-                },
-                {
-                    "name": "QQ邮箱",
-                    "url": "https://mail.qq.com",
-                    "icon": "./icon/qq_mail.ico",
-                    "subtitle": "腾讯旗下邮箱服务"
-                },
-                {
-                    "name": "临时邮箱",
-                    "subtitle": "国内临时邮箱",
-                    "url": "https://www.snapmail.cc/",
-                    "icon": "./icon/snapmail.ico"
-                },
-                {
-                    "name": "图怪兽",
-                    "subtitle": "作图工具",
-                    "url": "https://818ps.com/home",
-                    "icon": "./icon/tuguaishou.png"
-                },
-                {
-                    "name": "好维持",
-                    "subtitle": "虚假美国地址",
-                    "url": "https://www.haoweichi.com/",
-                    "icon": "./icon/haoweichi.ico"
-                },
-                {
-                    "name": "NatApp",
-                    "subtitle": "内网穿透",
-                    "url": "https://natapp.cn/",
-                    "icon": "./icon/natapp.png"
-                }
-            ],
-            "墙外世界": [
-                {
-                    name: "Youtube",
-                    subtitle: "国外视频平台",
-                    url: "https://www.youtube.com/",
-                    icon: "./icon/youtube.ico",
-                },
-
-                {
-                    name: "Stack Overflow",
-                    subtitle: "IT问答平台",
-                    url: "https://www.stackoverflow.com",
-                    icon: "./icon/stackoverflow.ico",
-                },
-                {
-                    name: "Jitter",
-                    subtitle: "动画制作网址",
-                    url: "https://jitter.video/",
-                    icon: "./icon/jitter.png",
-                },
-                {
-                    name: "Proton邮箱",
-                    subtitle: "Proton邮箱",
-                    url: "https://account.proton.me/mail",
-                    icon: "./icon/proton.ico",
-                },
-
-            ],
-            "优质博客": [
-                {
-                    "name": "L站",
-                    "url": "https://linux.do/",
-                    "icon": "./icon/linux.png",
-                    "subtitle": "新互联网分享平台"
-                },
-                {
-                    "name": "链滴",
-                    "url": "https://ld246.com/",
-                    "icon": "./icon/liandi.png",
-                    "subtitle": "思源笔记论坛"
-                }
-            ]
-        };
-
-
-        function renderLinks(category) {
-            // 使用更安全的选择器
-            const linksContainer = document.getElementById('links-container');
-
-            // 添加错误处理
-            if (!linksContainer) {
-                console.error('Links container not found');
-                return;
-            }
-
-            // 清空容器
-            linksContainer.innerHTML = '';
-
-            // 检查分类是否存在
-            if (!websites[category]) {
-                console.error('Category not found:', category);
-                return;
-            }
-
-            websites[category].forEach(site => {
-                const linkCard = document.createElement('div');
-                linkCard.className = 'link-card';
-                linkCard.addEventListener('click', () => {
-                    window.open(site.url, '_blank');
-                });
-
-                const icon = document.createElement('img');
-                icon.src = site.icon;
-                icon.alt = site.name;
-                icon.onerror = function () {
-                    // 如果图标加载失败，使用默认图标
-                    this.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="9" x2="15" y2="15"></line><line x1="15" y1="9" x2="9" y2="15"></line></svg>';
-                };
-
-                const link = document.createElement('a');
-                link.href = site.url;
-                link.target = '_blank';
-                link.textContent = site.name;
-
-                // 添加副标题
-                const subtitle = document.createElement('div');
-                subtitle.className = 'site-subtitle';
-                subtitle.textContent = site.subtitle;
-
-                linkCard.appendChild(icon);
-                linkCard.appendChild(link);
-                linkCard.appendChild(subtitle);
-                linksContainer.appendChild(linkCard);
-            });
-        }
-
-        // 初始化：默认显示常用网址
-        renderLinks('常用');
-
-        // 分类切换事件
-        const categoryList = document.getElementById('category-list');
-        if (categoryList) {
-            categoryList.addEventListener('click', function (e) {
-                const categoryTag = e.target.closest('.category-tag');
-                if (categoryTag) {
-                    // 移除所有active类
-                    this.querySelectorAll('.category-tag').forEach(tag => tag.classList.remove('active'));
-
-                    // 给点击的分类添加active类
-                    categoryTag.classList.add('active');
-
-                    // 渲染对应分类的链接
-                    renderLinks(categoryTag.dataset.category);
-                }
-            });
-        }
-
-        // 搜索功能
-        function performSearch() {
-            const searchEngine = document.getElementById('search-engine');
-            const searchInput = document.getElementById('search-input');
-
-            if (searchEngine && searchInput && searchInput.value) {
-                window.open(searchEngine.value + encodeURIComponent(searchInput.value), '_blank');
-            }
-        }
-
-        // 添加搜索按钮点击事件
-        const searchButton = document.querySelector('.search-wrapper button');
-        if (searchButton) {
-            searchButton.addEventListener('click', performSearch);
-        }
-
-        // 添加键盘回车事件监听
-        const searchInputElement = document.getElementById('search-input');
-        if (searchInputElement) {
-            searchInputElement.addEventListener('keypress', function (e) {
-                if (e.key === 'Enter') {
-                    performSearch();
-                }
-            });
-        }
-    });
-</script>
-
-
+  <!-- 引入模块化的 JavaScript 文件 -->
+  <script src="./data/websites.js"></script>
+  <script src="./js/config.js"></script>
+  <script src="./js/theme.js"></script>
+  <script src="./js/news.js"></script>
+  <script src="./js/links.js"></script>
+  <script src="./js/search.js"></script>
+  <script src="./js/app.js"></script>
 </body>
+
 </html>

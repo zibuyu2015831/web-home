@@ -1,15 +1,127 @@
+/* 根变量 - 浅色主题（默认） */
 :root {
+    /* 布局 */
+    --shadow-soft: 0 4px 12px rgba(0, 0, 0, 0.05);
+    --shadow-medium: 0 6px 16px rgba(0, 0, 0, 0.08);
+    --shadow-strong: 0 8px 24px rgba(0, 0, 0, 0.12);
+
+    /* 主色调 */
     --bg-primary: #f0f4f8;
     --bg-secondary: #ffffff;
     --color-primary: #2c3e50;
-    --color-accent: #06484c;
-    --shadow-soft: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --color-accent: #3498db;
+    --color-accent-deep: #067bc2;
+
+    /* 侧边栏（浅色） */
+    --sidebar-bg: #1a2332;
+    --sidebar-border: rgba(255, 255, 255, 0.1);
+    --sidebar-tab-bg: rgba(255, 255, 255, 0.1);
+    --sidebar-tab-active: linear-gradient(135deg, #3498db 0%, #067bc2 100%);
+    --sidebar-news-item: rgba(255, 255, 255, 0.06);
+    --sidebar-news-hover: rgba(255, 255, 255, 0.12);
+
+    /* 按钮 */
+    --btn-bg: var(--color-accent);
+    --btn-hover: #2980b9;
+    --btn-text: #ffffff;
+
+    /* 搜索 */
+    --search-border: #e0e0e0;
+    --search-focus: rgba(52, 152, 219, 0.3);
+
+    /* 标签 */
+    --tag-bg: var(--color-accent);
+    --tag-platform: linear-gradient(135deg, rgba(52, 152, 219, 0.35) 0%, rgba(6, 123, 194, 0.35) 100%);
+    --tag-time: rgba(52, 152, 219, 0.25);
+    --tag-hot: rgba(255, 193, 7, 0.2);
+
+    /* 模态框 */
+    --modal-bg: linear-gradient(135deg, #3498db 0%, #067bc2 100%);
+    --modal-content: #ffffff;
+    --modal-border: rgba(255, 255, 255, 0.2);
+
+    /* 过渡动画 */
+    --transition-fast: 0.2s ease;
+    --transition-normal: 0.3s ease;
+    --transition-slow: 0.4s ease;
+
+    /* 粒子 */
+    --particle-color: #3498db;
+    --particle-bg: rgba(255, 255, 255, 0.8);
+}
+
+/* 深色主题 */
+[data-theme="dark"] {
+    /* 主色调 */
+    --bg-primary: #121212;
+    --bg-secondary: #1e1e2e;
+    --color-primary: #e0e0e0;
+    --color-accent: #667eea;
+    --color-accent-deep: #764ba2;
+
+    /* 侧边栏（深色） */
+    --sidebar-bg: #0f0c1b;
+    --sidebar-border: rgba(255, 255, 255, 0.1);
+    --sidebar-tab-bg: rgba(255, 255, 255, 0.1);
+    --sidebar-tab-active: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --sidebar-news-item: rgba(255, 255, 255, 0.06);
+    --sidebar-news-hover: rgba(255, 255, 255, 0.12);
+
+    /* 阴影 */
+    --shadow-soft: 0 4px 12px rgba(0, 0, 0, 0.25);
+    --shadow-medium: 0 6px 16px rgba(0, 0, 0, 0.3);
+    --shadow-strong: 0 8px 24px rgba(0, 0, 0, 0.4);
+
+    /* 按钮 */
+    --btn-hover: #5a6fd8;
+
+    /* 搜索 */
+    --search-border: #2c3e50;
+    --search-focus: rgba(102, 126, 234, 0.3);
+
+    /* 标签 */
+    --tag-platform: linear-gradient(135deg, rgba(102, 126, 234, 0.35) 0%, rgba(118, 75, 162, 0.35) 100%);
+    --tag-time: rgba(102, 126, 234, 0.25);
+
+    /* 模态框 */
+    --modal-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+
+    /* 粒子 */
+    --particle-color: #667eea;
+    --particle-bg: rgba(255, 255, 255, 0.6);
+}
+
+/* 深色主题下的搜索框下拉箭头 */
+[data-theme="dark"] .search-wrapper select {
+    background-image: url("data:image/svg+xml;utf8,<svg fill='white' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/><path d='M0 0h24v24H0z' fill='none'/></svg>");
+}
+
+/* 深色主题下更明显的搜索框激活样式 */
+[data-theme="dark"] .search-wrapper:focus-within {
+    box-shadow: 0 0 0 2px var(--color-accent), 0 0 15px rgba(102, 126, 234, 0.5);
+    border: 1px solid var(--color-accent);
+    transform: translateY(-1px);
+}
+
+/* 主题切换动画 */
+.theme-transition {
+    animation: themeSwitch 0.5s ease;
+}
+
+@keyframes themeSwitch {
+    0% { filter: brightness(1); }
+    50% { filter: brightness(0.8); }
+    100% { filter: brightness(1); }
 }
 
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    transition: background-color var(--transition-normal),
+                color var(--transition-normal),
+                box-shadow var(--transition-normal),
+                border-color var(--transition-normal);
 }
 
 #particles-js {
@@ -18,8 +130,14 @@
     height: 100%;
     top: 0;
     left: 0;
-    z-index: -1; /* 确保粒子效果在内容下方 */
+    z-index: -1; /* 粒子在背景层 */
+}
 
+/* 让画布接收点击事件 */
+#particles-js canvas {
+    cursor: pointer;
+    width: 100% !important;
+    height: 100% !important;
 }
 
 body {
@@ -29,10 +147,75 @@ body {
     line-height: 1.6;
 }
 
+/* ===== 标题样式 ===== */
+
+/* 非排序模式下的标题样式 - 简约优雅 */
+.header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--color-accent), var(--color-accent-deep));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all var(--transition-normal);
+    position: relative;
+    padding: 10px 20px;
+    border-radius: 12px;
+    border: 1px solid transparent;
+    user-select: none; /* 防止文本选中 */
+    -webkit-user-select: none; /* Safari兼容性 */
+    -moz-user-select: none; /* Firefox兼容性 */
+    -ms-user-select: none; /* IE/Edge兼容性 */
+}
+
+/* 排序模式下的标题样式 - 明显区分 */
+body.sort-mode .header h1 {
+    backdrop-filter: blur(10px);
+    background-color: rgba(52, 152, 219, 0.15) !important;
+    border: 2px dashed var(--color-accent);
+    animation: pulse 2s infinite;
+    box-shadow: 0 0 15px rgba(52, 152, 219, 0.3);
+    transform: scale(1.05);
+    letter-spacing: 2px; /* 字间距更大 */
+}
+
+/* 深色模式下的样式调整 */
+[data-theme='dark'] .header h1 {
+    background-color: transparent;
+}
+
+[data-theme='dark'] body.sort-mode .header h1 {
+    background-color: rgba(102, 126, 234, 0.2) !important;
+    border-color: var(--color-accent);
+    box-shadow: 0 0 20px rgba(102, 126, 234, 0.4);
+}
+
+/* 标题悬停效果 */
+.header h1:hover {
+    color: var(--color-accent);
+    opacity: 0.9;
+    text-shadow: 0 0 15px rgba(102, 126, 234, 0.4);
+}
+
+body.sort-mode .header h1:hover {
+    background-color: rgba(52, 152, 219, 0.25) !important;
+    transform: scale(1.05) translateY(-2px);
+}
+
 .container {
     max-width: 1200px;
     margin: 0 auto;
     padding: 20px;
+    position: relative;
+    z-index: 1; /* 确保内容在粒子系统上方 */
+    pointer-events: none; /* 容器本身不接收事件 */
+}
+
+/* 确保容器内的元素可以接收事件 */
+.container > * {
+    pointer-events: auto;
 }
 
 .header {
@@ -53,18 +236,22 @@ body {
     overflow: hidden;
     max-width: 600px;
     width: 100%;
-    transition: box-shadow 0.3s ease;
+    transition: all var(--transition-normal);
+    border: 1px solid transparent;
+    pointer-events: auto; /* 确保搜索框可以交互 */
 }
 
 .search-wrapper:focus-within {
-    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.3);
+    box-shadow: 0 0 0 1px var(--color-accent);
+    border: 1px solid var(--color-accent);
 }
 
 .search-wrapper select {
     border: none;
     padding: 15px;
     background-color: transparent;
-    border-right: 1px solid #e0e0e0;
+    color: var(--color-primary);
+    border-right: 1px solid var(--search-border);
     font-size: 16px;
     outline: none;
     appearance: none;
@@ -77,6 +264,11 @@ body {
     padding-right: 30px;
 }
 
+.search-wrapper select option {
+    background-color: var(--bg-secondary);
+    color: var(--color-primary);
+}
+
 .search-wrapper input {
     border: none;
     flex-grow: 1;
@@ -84,6 +276,23 @@ body {
     background-color: transparent;
     font-size: 16px;
     outline: none;
+    color: var(--color-primary);
+}
+
+/* Placeholder文本样式 */
+.search-wrapper input::placeholder {
+    color: var(--color-primary);
+    opacity: 0.6;
+}
+
+.search-wrapper input::-webkit-input-placeholder {
+    color: var(--color-primary);
+    opacity: 0.6;
+}
+
+.search-wrapper input::-moz-placeholder {
+    color: var(--color-primary);
+    opacity: 0.6;
 }
 
 .search-wrapper button {
@@ -140,18 +349,52 @@ body {
     padding: 20px;
     text-align: center;
     box-shadow: var(--shadow-soft);
-    transition: all 0.3s;
+    transition: all var(--transition-normal);
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 12px;
     cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    /* 为新生成的卡片添加淡入效果 */
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0.9; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 .link-card:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-strong);
 }
+
+/* 卡片悬停时的柔和光效（从中心扩散） */
+.link-card::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(52, 152, 219, 0.1) 0%, transparent 70%);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s ease, height 0.6s ease;
+    pointer-events: none;
+}
+
+.link-card:hover::before {
+    width: 120%;
+    height: 120%;
+}
+
+[data-theme="dark"] .link-card::before {
+    background: radial-gradient(circle, rgba(102, 126, 234, 0.12) 0%, transparent 70%);
+}
+
 
 .link-card img {
     width: 60px;
@@ -264,4 +507,194 @@ body {
         width: 40px;
         height: 40px;
     }
+}
+
+/* ===== 拖拽排序模式相关样式 ===== */
+
+/* 基础导航模式：确保鼠标样式为pointer */
+.link-card {
+    cursor: pointer !important;  /* 强制确保非排序模式为pointer */
+}
+
+/* 排序模式 - 使用!important覆盖基础样式 */
+body.sort-mode .link-card {
+    cursor: -webkit-grab !important;
+    cursor: grab !important;
+    position: relative;
+}
+
+/* 拖拽指示器：排序模式下显示顶部 ☰ 图标 */
+body.sort-mode .link-card::before {
+    content: "☰";
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    color: var(--color-accent);
+    opacity: 0.7;
+    font-size: 16px;
+    pointer-events: none;
+}
+
+/* 排序模式悬停效果：简约上浮 */
+body.sort-mode .link-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+    border: 1px solid rgba(52, 152, 219, 0.4);
+    transition: all 0.25s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+/* ===== "添加网站"卡片 - 不参与拖拽样式 ===== */
+
+/* 隐藏"添加网站"卡片的拖拽指示器 */
+body.sort-mode .add-card-static::before {
+    display: none !important;
+}
+
+/* "添加网站"卡片悬停时保持正常但不上浮 */
+body.sort-mode .add-card-static:hover {
+    transform: none !important;  /* 不上浮，保持静止 */
+    box-shadow: var(--shadow-soft) !important;  /* 保持原阴影 */
+    border: 1px solid var(--color-accent) !important;  /* 正常边框 */
+}
+
+/* 排序模式下"添加网站"卡片 - 不参与拖拽，可点击 */
+body.sort-mode .add-card-static {
+    cursor: pointer !important;  /* 保持指针样式，可点击 */
+    position: relative;
+}
+
+
+/* ===== 分类标签拖拽样式 ===== */
+
+/* 排序模式下分类标签样式 */
+body.sort-mode .category-tag {
+    cursor: grab !important;
+    position: relative;
+    user-select: none;
+}
+
+/* 分类标签拖拽指示器 */
+body.sort-mode .category-tag::after {
+    content: "☰";
+    position: absolute;
+    top: 4px;
+    right: 8px;
+    color: var(--color-accent);
+    opacity: 0.6;
+    font-size: 12px;
+    pointer-events: none;
+}
+
+/* 拖拽中的分类标签 */
+.category-tag.dragging {
+    opacity: 0.7;
+    transform: scale(1.03);
+    z-index: 1000;
+    cursor: grabbing !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* 拖拽悬停目标分类 */
+.category-tag.drag-over {
+    border: 2px dashed rgba(52, 152, 219, 0.5) !important;
+    background-color: rgba(52, 152, 219, 0.1) !important;
+    transform: scale(1.02);
+}
+
+[data-theme="dark"] .category-tag.drag-over {
+    background-color: rgba(102, 126, 234, 0.15) !important;
+    border-color: rgba(102, 126, 234, 0.5) !important;
+}
+
+/* 添加分类按钮样式 */
+body.sort-mode .add-category-btn {
+    background-color: rgba(52, 152, 219, 0.1);
+    border: 2px dashed var(--color-accent);
+    color: var(--color-accent);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-width: 100px;
+    text-align: center;
+    justify-content: center;
+}
+
+body.sort-mode .add-category-btn:hover {
+    background-color: rgba(52, 152, 219, 0.2);
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(52, 152, 219, 0.2);
+}
+
+[data-theme="dark"] body.sort-mode .add-category-btn {
+    background-color: rgba(102, 126, 234, 0.1);
+    border-color: var(--color-accent-dark);
+    color: var(--color-accent-dark);
+}
+
+[data-theme="dark"] body.sort-mode .add-category-btn:hover {
+    background-color: rgba(102, 126, 234, 0.2);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+}
+
+
+/* 拖拽中的样式：简约半透明效果 */
+.link-card.dragging {
+    cursor: -webkit-grabbing !important;
+    cursor: grabbing !important;
+    opacity: 0.7;
+    transform: scale(1.03);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    border: 1px solid rgba(52, 152, 219, 0.5);
+    z-index: 1000;
+    transition: none;
+}
+
+/* 拖拽悬停目标：轻微提升和边框变化 */
+.link-card.drag-over {
+    border: 2px dashed rgba(52, 152, 219, 0.5);
+    background-color: rgba(52, 152, 219, 0.08);
+    transform: scale(1.01) translateY(-2px);
+    transition: all 0.2s ease;
+}
+
+[data-theme="dark"] .link-card.drag-over {
+    background-color: rgba(102, 126, 234, 0.1);
+    border-color: rgba(102, 126, 234, 0.5);
+}
+
+/* 标题排序状态样式：简约高亮 */
+body.sort-mode header h1 {
+    color: var(--color-accent);
+    background-color: rgba(52, 152, 219, 0.1);
+    border: 1px solid rgba(52, 152, 219, 0.3);
+    transform: scale(1.03);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* 提示信息样式：固定在页面顶部中央 */
+.toast {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--color-accent);
+    color: white;
+    padding: 12px 20px;
+    border-radius: 4px;
+    font-size: 14px;
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+    box-shadow: var(--shadow-soft);
+    max-width: 90%;
+    text-align: center;
+}
+
+.toast.show {
+    opacity: 1;
+}
+
+/* 深色主题下的提示信息背景 */
+[data-theme="dark"] .toast {
+    background: var(--color-accent-deep);
 }
